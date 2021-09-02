@@ -3,9 +3,10 @@
         <a @click="getData()">{{temp}}</a>
     
         <grid 
-            ref="tuiGrid"
+            ref="testGrid"
             :data="gridPros.gridData"
             :columns="gridPros.columns"
+            :options="gridPros.options"
             :scrollX="gridPros.scrollX"
             :scrollY="gridPros.scrollY"
         ></grid>
@@ -13,23 +14,30 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import axios from 'axios'
+Vue.prototype.$http = axios
 
-// const url = 'https://api.hnpwa.com/v0/news/1.json'
+// const url = 'V1/js/json.json'
 
-const dataSource = {
-    api: {
-        readData: {url: 'https://api.hnpwa.com/v0/news/1.json', methods: 'GET'}
-    }
-}
+// const dataSource = {
+//     contentType: 'application/json',
+//     api: {
+//         readData: {url, methods: 'GET'},
+//         initialRequest: false
+//     }
+// }
 
 export default {
-  inheritAttrs: false,
-  name: "Page1",
-  
+    inheritAttrs: false,
+    name: "Page1",
+    data() {
+        return {
+            temp: '변경전',
+            gridPros: null
+        }
+  } ,
   created() {
-    // this.getData();
-
     this.gridPros = {
         gridData: [],
         columns: [
@@ -44,36 +52,39 @@ export default {
             { header: 'url', name: 'url' },
             { header: 'user', name: 'user' },
         ],
-        data: dataSource,
-        scrollX: false,
-        scrollY: false,
-    }
-
-  },
-  data() {
-    return {
-        temp: '변경전',
-        gridPros: null
+        // data: dataSource,
+        // scrollX: false,
+        // scrollY: false,
+        options: {
+            pageOptions: {
+                perPage: 10
+            }
+        }
     }
   },
   methods: {
     getData () {
-      axios.get('https://api.hnpwa.com/v0/news/1.json')
-          .then((res) => {
-            // console.log(res.data);
-            this.gridData = res.data;
-          })
-          this.$refs.tuiGrid.invoke('readData', 1, null, true)
-    },
-    addData123 () {
-        // console.log('before', this.gridData)
-        // console.log('after', this.gridData)
-        // this.temp = '변경후'
-        let params = {
-            a: 'test',
-            b: 'text'
-        }
-        this.$refs.tuiGrid.invoke('readData', 1, params, true)
+        // axios.get('http://localhost:4000/js/json.json', {
+        //     crossDomain: true
+        // })
+        // .then((res) => {
+        // console.log(res.data);
+        // // this.gridData = res.data;
+        // })
+        // let params = {
+        //     'a': 'test',
+        //     'b': 'text'
+        // }
+        // this.$refs.tuiGrid2.invoke('readData', 1, params, true)
+
+        this.$http.get('V1/js/json2.json').then((res) => {
+            console.log(res.data);
+            const _grid = this.$refs.testGrid.gridInstance
+            _grid.resetData(res.data);
+            // this.$refs.testGrid.gridInstance.resetData(res.data);
+            // this.$refs.tuiGrid.gridInstance.clear();
+            // this.$refs.tuiGrid.gridInstance.appendRows(res.data);
+        })
     }
   }
 }
