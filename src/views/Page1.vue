@@ -18,15 +18,14 @@ import Vue from 'vue'
 import axios from 'axios'
 Vue.prototype.$http = axios
 
-// const url = 'V1/js/json.json'
-
-// const dataSource = {
-//     contentType: 'application/json',
-//     api: {
-//         readData: {url, methods: 'GET'},
-//         initialRequest: false
-//     }
-// }
+const dataSource = {
+    contentType: 'application/json',
+    api: {
+        // readData(page:[Page number], data:[Data(parameters) to send to the server], resetData:[If set to true, last requested data will be ignored.])
+        readData: {url: 'V1/js/json.json', methods: 'GET'},
+        initialRequest: false
+    }
+}
 
 export default {
     inheritAttrs: false,
@@ -52,7 +51,7 @@ export default {
             { header: 'url', name: 'url' },
             { header: 'user', name: 'user' },
         ],
-        // data: dataSource,
+        data: dataSource,
         // scrollX: false,
         // scrollY: false,
         options: {
@@ -64,27 +63,14 @@ export default {
   },
   methods: {
     getData () {
-        // axios.get('http://localhost:4000/js/json.json', {
-        //     crossDomain: true
-        // })
-        // .then((res) => {
-        // console.log(res.data);
-        // // this.gridData = res.data;
-        // })
-        // let params = {
-        //     'a': 'test',
-        //     'b': 'text'
-        // }
-        // this.$refs.tuiGrid2.invoke('readData', 1, params, true)
 
-        this.$http.get('V1/js/json2.json').then((res) => {
-            console.log(res.data);
-            const _grid = this.$refs.testGrid.gridInstance
-            _grid.resetData(res.data);
-            // this.$refs.testGrid.gridInstance.resetData(res.data);
-            // this.$refs.tuiGrid.gridInstance.clear();
-            // this.$refs.tuiGrid.gridInstance.appendRows(res.data);
-        })
+        this.$refs.testGrid.invoke('readData', 1, null, true)
+
+        // this.$http.get('V1/js/json2.json').then((res) => {
+        //     console.log(res.data);
+        //     const _grid = this.$refs.testGrid.gridInstance
+        //     _grid.resetData(res.data);
+        // })
     }
   }
 }
