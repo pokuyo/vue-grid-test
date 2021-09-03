@@ -1,135 +1,115 @@
 <template>
     <div>
-        <a @click="getData()">{{temp}}</a>
-    
-        <grid 
-            ref="testGrid"
-            :data="gridPros.gridData"
+        <grid ref="tuiGrid"
+            :data="gridPros.data"
             :columns="gridPros.columns"
             :options="gridPros.options"
             :scrollX="gridPros.scrollX"
             :scrollY="gridPros.scrollY"
+            @dblclick="dblclick"
+            @focusChange="focusChange"
+            @afterChange="afterChange"
+            @response="response"
         ></grid>
+        <div>
+            <button @click="updateData">test</button>
+            <!-- <p>{{ $t('dataPreprocessing_010') }}</p> -->
+        </div>
     </div>
 </template>
 
 <script>
-import Vue from 'vue'
-import axios from 'axios'
-Vue.prototype.$http = axios
-
 const dataSource = {
     contentType: 'application/json',
     api: {
         // readData(page:[Page number], data:[Data(parameters) to send to the server], resetData:[If set to true, last requested data will be ignored.])
-        readData: {url: 'V1/js/json.json', methods: 'GET'},
-        initialRequest: false
+        readData: {url: 'V1/sample/requestdata', method: 'POST', initParams: { test: 'test'}},
+        updateData: {url: 'V1/sample/updatedata', method: 'POST'},
+        initialRequest: false // 초기 렌더링 시 백엔드에 요청 X
     }
 }
 
 export default {
-    inheritAttrs: false,
-    name: "Page1",
     data() {
         return {
-            temp: '변경전',
             gridPros: null
         }
-  } ,
-  created() {
-    this.gridPros = {
-        gridData: [],
-        columns: [
-            { header: 'comments_count', name: 'comments_count' },
-            { header: 'domain', name: 'domain' },
-            { header: 'id', name: 'id' },
-            { header: 'points', name: 'points' },
-            { header: 'time', name: 'time' },
-            { header: 'time_ago', name: 'time_ago' },
-            { header: 'title', name: 'title' },
-            { header: 'type', name: 'type' },
-            { header: 'url', name: 'url' },
-            { header: 'user', name: 'user' },
-        ],
-        data: dataSource,
-        // scrollX: false,
-        // scrollY: false,
-        options: {
-            pageOptions: {
-                perPage: 10
+    },
+    created() {
+        this.gridPros = {
+            // gridData: [],
+            columns: [
+                { header: 'comments_count', name: 'comments_count', editor: 'text'},
+                { header: 'domain', name: 'domain', editor: 'text'},
+                { header: 'id', name: 'id', editor: 'text'},
+                { header: 'points', name: 'points', editor: 'datePicker'},
+                { header: 'time', name: 'time'},
+                { header: 'time_ago', name: 'time_ago'},
+                { header: 'title', name: 'title'},
+                { header: 'type', name: 'type'},
+                { header: 'url', name: 'url'},
+                { header: 'user', name: 'user'},
+            ],
+            data: dataSource,
+            scrollX: false,
+            scrollY: false,
+            options: {
+                pageOptions: {
+                    perPage: 10
+                },
+                columnOptions: {
+                    resizable: true
+                }
             }
         }
-    }
   },
   methods: {
+    // 그리드데이터 호출 (후 호출)
     getData () {
+        let params = {
+            search: 'test',
+            indexer: 99
+        }
+        this.$refs.tuiGrid.invoke('readData', 1, params, true)
+    },
+    // 더블클릭 이벤트
+    dblclick(ev) {
+        // console.log('clickCell', ev)
+        console.log('clickCell', this.$refs.tuiGrid.gridInstance.getRow(ev.rowKey))
+    },
+    // 포커스 변경 이벤트
+    focusChange () {
+        // console.log('focusChange', ev)
+    },
+    // 셀값 변경 이벤트
+    afterChange (ev) {
+        console.log('afterChange', ev)
+    },
+    // 그리드 정보 저장
+    updateData (ev) {
+        // update 전 마지막 수정 row 있을때 edit finsih
+        if (ev != null) {
+            this.$refs.tuiGrid.gridInstance.finishEditing(ev.rowKey, ev.columnName, ev.value)
+        }
 
-        this.$refs.testGrid.invoke('readData', 1, null, true)
+        // this.$refs.tuiGrid.gridInstance.getModifiedRows()
+        // console.log('update', this.$refs.tuiGrid.invoke('getModifiedRows'))
+        // let params = this.$refs.tuiGrid.invoke('getModifiedRows')
+        // this.$refs.tuiGrid.invoke('updateData', params)
 
-        // this.$http.get('V1/js/json2.json').then((res) => {
-        //     console.log(res.data);
-        //     const _grid = this.$refs.testGrid.gridInstance
-        //     _grid.resetData(res.data);
-        // })
+        let params = {
+            url: 'V1/sample/updatedata',
+            method: 'POST',
+            // 수정항목만 전달 (false 지정 시 현 페이지 내 전체 row 전달)
+            modifiedOnly: true
+        }
+        this.$refs.tuiGrid.gridInstance.request('updateData', params)
+        // this.getData()
+    },
+    response (res) {
+        // 응답함수(공통) : this.$responseData(res)
+        if(this.$gridResponse(res)) this.$refs.tuiGrid.gridInstance.reloadData();
     }
   }
 }
-
-// let tempData2 = [
-//     {
-//       "name": "Beautiful Lies",
-//       "artist": "Birdy",
-//       "type": "Deluxe",
-//       "release": "2016.3.26",
-//       "genre": "Pop",
-//       "price": 1000,
-//       "downloadCount": 1000,
-//       "listenCount": 5000,
-//       "genreCode": "1",
-//       "typeCode": "1",
-//       "grade": "1"
-//     }
-// ]
-
-// let tempData = [
-//     {
-//       "name": "Beautiful Lies",
-//       "artist": "Birdy",
-//       "type": "Deluxe",
-//       "release": "2016.3.26",
-//       "genre": "Pop",
-//       "price": 1000,
-//       "downloadCount": 1000,
-//       "listenCount": 5000,
-//       "genreCode": "1",
-//       "typeCode": "1",
-//       "grade": "1"
-//     },
-//     {
-//       "name": "X",
-//       "artist": "Ed Sheeran",
-//       "type": "Deluxe",
-//       "release": "2014.6.24",
-//       "genre": "Pop",
-//       "price": 7000,
-//       "downloadCount": 1000,
-//       "listenCount": 5000,
-//       "genreCode": "1",
-//       "typeCode": "1",
-//       "grade": "2"
-//     },
-//     {
-//       "name": "Moves Like Jagger",
-//       "artist": "Maroon5",
-//       "type": "Single",
-//       "release": "2011.8.8",
-//       "genre": "Pop,Rock",
-//       "price": 25000,
-//       "downloadCount": 1000,
-//       "listenCount": 5000,
-//       "genreCode": "1",
-//       "typeCode": "1",
-//       "grade": "3"
-//     },
-//   ]
 </script>
