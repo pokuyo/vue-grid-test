@@ -2,7 +2,7 @@ module.exports = {
     devServer: {
         proxy: {
             '/V1': {
-                target: 'http://localhost:4000',
+                target: 'http://localhost:8080',
                 changeOrigin: true,
                 pathRewrite: {
                     '^/V1': ''

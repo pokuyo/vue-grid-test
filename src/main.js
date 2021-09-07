@@ -12,33 +12,14 @@ import { Grid } from '@toast-ui/vue-grid'
 
 import comm from './assets/common/js/common.js'
 
-import VueI18n from 'vue-i18n'
-
-async function setI18n () {
-  Vue.use(VueI18n)
-  let langs = await axios.post('V1/sample/getDBMessage')
-  console.log(langs.data.data)
-  let message = langs.data
-
-  return new VueI18n({
-    locale: 'ko',
-    fallbackLocale: 'ko',
-    message
-  })
-}
-
 Vue.component('grid',Grid)
 Vue.use(comm)
 
 Vue.config.productionTip = false
-Vue.prototype.$http = axios
+// Vue.prototype.$http = axios
 
-setI18n()
-  .then((i18n) => {
-    new Vue({
-      render: h => h(App),
-      router,
-      axios,
-      i18n
-    }).$mount('#app')
-  })
+new Vue({
+  render: h => h(App),
+  router,
+  axios,
+}).$mount('#app')

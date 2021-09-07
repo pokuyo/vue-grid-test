@@ -13,7 +13,7 @@
         ></grid>
         <div>
             <button @click="updateData">test</button>
-            <p>{{ $t('dataPreprocessing_010') }}</p>
+            <!-- <p>{{ $t('dataPreprocessing_010') }}</p> -->
         </div>
     </div>
 </template>
