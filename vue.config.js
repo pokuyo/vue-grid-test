@@ -1,21 +1,14 @@
 module.exports = {
     devServer: {
+        contentBase: '.',
+        port: 5000,
         proxy: {
-            '/V1': {
-                target: 'http://localhost:8080',
+            '/api': {
+                target: 'http://localhost:9000',
                 changeOrigin: true,
-                pathRewrite: {
-                    '^/V1': ''
-                }
-            },
-            '/V2': {
-                target: 'https://loclhost:4437',
-                changeOrigin: true,
-                pathRewrite: {
-                    '^/V2': ''
-                }
-            },
-    
+                // ws: false,
+                pathRewrite: {'^/api': '/api'}
+            }
         }
     }
 }

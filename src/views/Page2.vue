@@ -30,12 +30,7 @@
 <script>
 const storage = window.sessionStorage;
 
-import axios from 'axios'
-
-// const ai = axios.create({
-    // baseUrl: 'http://localhost:8080/api'
-    // baseUrl: 'V1'
-// })
+// import axios from 'axios'
 
 export default {
     data () {
@@ -61,8 +56,8 @@ export default {
             this.setInfo('success logout', '', '')
         },
         getInfo () {
-            axios.post(
-                'V1/info',
+            this.$axios.post(
+                '/api/info',
                 {
                     email: 'some@email.com',
                     password: 'somepassword'
@@ -81,18 +76,20 @@ export default {
             })
         },
         login () {
-            storage.setItem('jwt-auth-token', '')
+            storage.setItem('authorization', '')
             storage.setItem('login_user', '')
-            axios.post('V1/user/signin', {
-                email: this.email,
-                password: this.password
+            this.$axios.post('/api/user/signin', { usr_id: this.email, usr_pw: this.password }, {
+                headers: {
+                    Authorization: ''
+                }
             })
             .then(res => {
+                console.log(res)
                 if (res.data.status) {
                     this.message = res.data.data.email + '로 로그인 되었습니다.'
-                    console.dir(res.headers['jwt-auth-token'])
-                    this.setInfo('성공', res.headers['jwt-auth-token'], JSON.stringify(res.data.data))
-                    storage.setItem('jwt-auth-token', res.headers['jwt-auth-token'])
+                    console.dir(res.headers['authorization'])
+                    this.setInfo('성공', res.headers['authorization'], JSON.stringify(res.data.data))
+                    storage.setItem('authorization', res.headers['authorization'])
                     storage.setItem('login_user', res.data.data.email)
                 } else {
                     this.setInfo('', '', '')

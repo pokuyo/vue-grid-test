@@ -19,23 +19,27 @@
 </template>
 
 <script>
+const storage = window.sessionStorage;
 const dataSource = {
     contentType: 'application/json',
     api: {
         // readData(page:[Page number], data:[Data(parameters) to send to the server], resetData:[If set to true, last requested data will be ignored.])
-        readData: {url: 'V1/sample/requestdata', method: 'POST', initParams: { test: 'test'}},
-        updateData: {url: 'V1/sample/updatedata', method: 'POST'},
-        initialRequest: false // 초기 렌더링 시 백엔드에 요청 X
+        readData: {url: '/api/sample/requestdata', method: 'POST', initParams: { test: 'test'}, headers: { 'Authorization': 'Bearer '+storage.getItem('authorization') }},
+        updateData: {url: '/api/sample/updatedata', method: 'POST'},
+        initialRequest: false, // 초기 렌더링 시 백엔드에 요청 X
     }
 }
 
 export default {
     data() {
         return {
-            gridPros: null
+            gridPros: null,
         }
     },
     created() {
+
+        // alert(storage.getItem('authorization') )
+
         this.gridPros = {
             // gridData: [],
             columns: [
@@ -98,7 +102,7 @@ export default {
         // this.$refs.tuiGrid.invoke('updateData', params)
 
         let params = {
-            url: 'V1/sample/updatedata',
+            url: '/api/sample/updatedata',
             method: 'POST',
             // 수정항목만 전달 (false 지정 시 현 페이지 내 전체 row 전달)
             modifiedOnly: true

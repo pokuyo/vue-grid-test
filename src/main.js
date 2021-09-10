@@ -16,7 +16,7 @@ Vue.component('grid',Grid)
 Vue.use(comm)
 
 Vue.config.productionTip = false
-// Vue.prototype.$http = axios
+Vue.prototype.$axios = axios
 
 new Vue({
   render: h => h(App),
