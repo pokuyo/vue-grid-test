@@ -1,5 +1,6 @@
 <template>
     <div>
+        <p>data: {{authkey}}</p>
         <grid ref="tuiGrid"
             :data="gridPros.data"
             :columns="gridPros.columns"
@@ -12,36 +13,70 @@
             @response="response"
         ></grid>
         <div>
-            <button @click="updateData">test</button>
+            <button @click="getData">getData</button>
+            <!-- <p>{{ $t('dataPreprocessing_010') }}</p> -->
+        </div>
+        <div>
+            <button @click="updateData">updateData</button>
             <!-- <p>{{ $t('dataPreprocessing_010') }}</p> -->
         </div>
     </div>
 </template>
 
 <script>
-const storage = window.sessionStorage;
+const storage = window.sessionStorage
 const dataSource = {
     contentType: 'application/json',
     api: {
-        // readData(page:[Page number], data:[Data(parameters) to send to the server], resetData:[If set to true, last requested data will be ignored.])
-        readData: {url: '/api/sample/requestdata', method: 'POST', initParams: { test: 'test'}, headers: { 'Authorization': 'Bearer '+storage.getItem('authorization') }},
+        /**
+         * [PARAMS]
+         * readData(page:[Page number], 
+         * data:[Data(parameters) to send to the server], 
+         * resetData:[If set to true, last requested data will be ignored.])
+         */
+        readData: {url: '/api/sample/requestdata', method: 'POST', initParams: { test: 'test'}},
         updateData: {url: '/api/sample/updatedata', method: 'POST'},
-        initialRequest: false, // 초기 렌더링 시 백엔드에 요청 X
-    }
+    },
+    // headers: { 'Authorization': 'Bearer '+ storage.getItem('authorization') },
+    initialRequest: false, // 초기 렌더링 시 백엔드에 요청 X
+}
+
+function refreshAuth () {
+    console.log('refreshauth in')
+    storage = window.sessionStorage
+    dataSource.headers = { 'Authorization': 'Bearer '+ window.sessionStorage.getItem('authorization') }
+    console.log('storage', storage)
+    console.log('dataSource', dataSource)
 }
 
 export default {
     data() {
         return {
             gridPros: null,
+            authkey: '0000'
+            // authkey: null
+            // storage: window.sessionStorage,
+            // dataSource: {
+            //     contentType: 'application/json',
+            //     api: {
+            //         /**
+            //          * [PARAMS]
+            //          * readData(page:[Page number], 
+            //          * data:[Data(parameters) to send to the server], 
+            //          * resetData:[If set to true, last requested data will be ignored.])
+            //          */
+            //         readData: {url: '/api/sample/requestdata', method: 'POST', initParams: { test: 'test'}},
+            //         updateData: {url: '/api/sample/updatedata', method: 'POST'},
+            //     },
+            //     headers: { 'Authorization': 'Bearer '+ storage.getItem('authorization') },
+            //     initialRequest: false, // 초기 렌더링 시 백엔드에 요청 X
+            // }
         }
     },
     created() {
-
-        // alert(storage.getItem('authorization') )
-
+        this.getAuthkey()
+        refreshAuth()
         this.gridPros = {
-            // gridData: [],
             columns: [
                 { header: 'comments_count', name: 'comments_count', editor: 'text'},
                 { header: 'domain', name: 'domain', editor: 'text'},
@@ -70,6 +105,9 @@ export default {
   methods: {
     // 그리드데이터 호출 (후 호출)
     getData () {
+        refreshAuth()
+        dataSource.headers = { 'Authorization': 'Bearer '+ window.sessionStorage.getItem('authorization') }
+        // console.log('▶ req token :: ', storage.getItem('authorization') )
         let params = {
             search: 'test',
             indexer: 99
@@ -112,7 +150,12 @@ export default {
     },
     response (res) {
         // 응답함수(공통) : this.$responseData(res)
-        if(this.$gridResponse(res)) this.$refs.tuiGrid.gridInstance.reloadData();
+        if(this.$gridResponse(res)) {
+            this.$refs.tuiGrid.gridInstance.reloadData();
+        }
+    },
+    getAuthkey () {
+        this.authkey = this.$getAuth()
     }
   }
 }

@@ -28,9 +28,7 @@
 </template>
 
 <script>
-const storage = window.sessionStorage;
-
-// import axios from 'axios'
+let storage = window.sessionStorage;
 
 export default {
     data () {
@@ -50,7 +48,7 @@ export default {
             this.info = info
         },
         logOut () {
-            storage.setItem('jwt-auth-token', '')
+            storage.setItem('authorization', '')
             storage.setItem('login_user', '')
             this.message = 'please login'
             this.setInfo('success logout', '', '')
@@ -64,7 +62,7 @@ export default {
                 },
                 {
                     headers: {
-                        'jwt-auth-token': storage.getItem('jwt-auth-token')
+                        'authorization': storage.getItem('authorization')
                     }
                 }
             )
@@ -84,12 +82,14 @@ export default {
                 }
             })
             .then(res => {
-                console.log(res)
+                let authToken = res.headers.authorization
+                console.log('login res', res)
                 if (res.data.status) {
-                    this.message = res.data.data.email + '로 로그인 되었습니다.'
-                    console.dir(res.headers['authorization'])
-                    this.setInfo('성공', res.headers['authorization'], JSON.stringify(res.data.data))
-                    storage.setItem('authorization', res.headers['authorization'])
+                    this.message = '로그인 되었습니다.'
+                    console.dir('▶ login res token : ', authToken)
+
+                    this.setInfo('성공', authToken, JSON.stringify(res.data.data))
+                    storage.setItem('authorization', authToken)
                     storage.setItem('login_user', res.data.data.email)
                 } else {
                     this.setInfo('', '', '')
@@ -102,10 +102,11 @@ export default {
             })
         },
         init () {
-            if (storage.getItem('jwt-auth-token')) {
-                this.message = storage.getItem('login_user') + '로 로그인 되었습니다.'
+            if (storage.getItem('authorization')) {
+                this.message = '로그인 되었습니다.'
+                this.token = storage.getItem('authorization')
             } else {
-                storage.setItem('jwt-auth-token', '')
+                storage.setItem('authorization', '')
             }
         }
     },

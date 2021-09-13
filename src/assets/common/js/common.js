@@ -1,4 +1,7 @@
+import { router } from "../../../router";
+
 // common function
+const storage = window.sessionStorage;
 const methods = {
     // grid response
     gridResponse: (res) => {
@@ -13,13 +16,26 @@ const methods = {
                 resultFlag = false
             }
         }
+        if (result.status === 401) {
+            alert('로그인만료')
+            router.push('/page2')
+        }
         return resultFlag
+    },
+    getAuth: () => {
+        let header = {
+            headers: {
+                'Authorization': 'Bearer '+storage.getItem('authorization')
+            }
+        }
+        return header
     }
 }
 
 export default {
     install (Vue) {
         Vue.prototype.$gridResponse = methods.gridResponse
+        Vue.prototype.$getAuth = methods.getAuth
     }
 }
 
