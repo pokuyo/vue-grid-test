@@ -1,4 +1,4 @@
-import { router } from "../../../router";
+// import { router } from "../../../router";
 
 // common function
 const storage = window.sessionStorage;
@@ -18,7 +18,7 @@ const methods = {
         }
         if (result.status === 401) {
             alert('로그인만료')
-            router.push('/page2')
+            // router.push('/page2')
         }
         return resultFlag
     },

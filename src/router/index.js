@@ -33,7 +33,7 @@ export const router = new VueRouter({
 router.beforeEach((to, from, next) => {
     if (to.meta.auth && !store.getter.isLogin) {
         console.log('required auth')
-        next('/page2')
+        // next('/page2')
         return
     }
 
