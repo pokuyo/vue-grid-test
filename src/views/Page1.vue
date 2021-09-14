@@ -83,6 +83,11 @@ export default {
     getData () {
         refreshAuth()
         let params = { search: 'test', indexer: 99 }
+        this.$refs.tuiGrid.invoke('on', 'beforeRequest', function(ev) {
+            ev.xhr.setRequestHeader('Authorization', 'Bearer '+ window.sessionStorage.getItem('authorization'));
+            console.log('ev', ev)
+        });
+
         this.$refs.tuiGrid.invoke('readData', 1, params, true)
     },
     // 더블클릭 이벤트
