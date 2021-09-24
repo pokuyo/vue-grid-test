@@ -36,8 +36,49 @@ export default {
     install (Vue) {
         Vue.prototype.$gridResponse = methods.gridResponse
         Vue.prototype.$getAuth = methods.getAuth
+        // 그리드 조회
+        Vue.prototype.$pamTuiGridReadData = function( params ){
+            
+            this.pamTuiApiEvent = 'readData';
+            this.pamTuiApiData = params;
+            
+            this.$refs.tuiGrid.invoke('readData', 1, params, true)
+        }
+        // 그리드 조회 전 처리
+        Vue.prototype.$pamTuiGridBeforeRequest = function( evt, dataSource ){
+            
+            evt.stopped = true;
+            
+            var pagination = evt.instance.paginationManager.getPagination();
+            
+            if(this.pamTuiApiData){
+                this.pamTuiApiData.page = this.pamTuiApiPage + 0;
+                this.pamTuiApiData.perPage = pagination._currentPage;
+            }
+            
+            this.pamTuiApiPage = 1;
+            
+            if(window['instanceWithAuth'] && dataSource.api[this.pamTuiApiEvent]){
+                var _tmpTuiGrid = this.$refs.tuiGrid;
+                
+                window.instanceWithAuth.post( dataSource.api[this.pamTuiApiEvent]['url'] , this.pamTuiApiData)
+                .then(res => {
+                    _tmpTuiGrid.invoke('resetData', res.data.data.contents, {pageState : res.data.data.pagination});
+                    
+                    // 수정 필요
+                    //this.$gridResponse(res);
+                })
+                .catch(e => {
+                    alert(e.message)
+                })
+            }
+            
+        }
+        
+        // 그리드 페이징 처리
+        Vue.prototype.$pamTuiGridBeforePageMove = function( evt ){
+            this.pamTuiApiPage = evt.page;
+        }
+        
     }
 }
-
-
-

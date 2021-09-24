@@ -87,12 +87,7 @@ export default {
         //refreshAuth()
         let params = { search: 'test', indexer: 99 }
         
-        window._tui_api_event = 'readData';
-        window._tui_api_data = params;
-        
-        this.$refs.tuiGrid.invoke('readData', 1, params, true)
-        
-        
+        this.$pamTuiGridReadData( params );
     },
     // 더블클릭 이벤트
     dblclick(ev) {
@@ -127,31 +122,11 @@ export default {
         }
     },
     beforeRequest(evt){
-        evt.stopped = true;
         
-        var pagination = evt.instance.paginationManager.getPagination();
-        
-        if(window._tui_api_data){
-            window._tui_api_data.page = window._tui_api_page + 0;
-            window._tui_api_data.perPage = pagination._currentPage;
-        }
-        
-        window._tui_api_page = 1;
-        
-        if(window['instanceWithAuth'] && dataSource.api[window._tui_api_event]){
-            var _tmpTuiGrid = this.$refs.tuiGrid;
-            
-            window.instanceWithAuth.post( dataSource.api[window._tui_api_event]['url'] , window._tui_api_data)
-            .then(res => {
-                _tmpTuiGrid.invoke('resetData', res.data.data.contents, {pageState : res.data.data.pagination});
-            })
-            .catch(e => {
-                alert(e.message)
-            })
-        }
+        this.$pamTuiGridBeforeRequest( evt, dataSource );
     }
     ,beforePageMove(evt){
-        window._tui_api_page = evt.page;
+        this.$pamTuiGridBeforePageMove( evt );
     }
     ,onGridUpdated(evt){
         console.log('onGridUpdated', evt)
