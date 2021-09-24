@@ -11,6 +11,9 @@
             @focusChange="focusChange"
             @afterChange="afterChange"
             @response="response"
+            @onGridUpdated="onGridUpdated"
+            @beforeRequest="beforeRequest"
+            @beforePageMove="beforePageMove"
         ></grid>
         <div>
             <button @click="getData">getData</button>
@@ -40,9 +43,9 @@ const dataSource = {
     initialRequest: false, 
 }
 
-function refreshAuth () {
-    dataSource.headers = { 'Authorization': 'Bearer '+ window.sessionStorage.getItem('authorization') }
-}
+//function refreshAuth () {
+//    dataSource.headers = { 'Authorization': 'Bearer '+ window.sessionStorage.getItem('authorization') }
+//}
 
 export default {
     data() {
@@ -81,14 +84,15 @@ export default {
   methods: {
     // 그리드데이터 호출
     getData () {
-        refreshAuth()
+        //refreshAuth()
         let params = { search: 'test', indexer: 99 }
-        this.$refs.tuiGrid.invoke('on', 'beforeRequest', function(ev) {
-            ev.xhr.setRequestHeader('Authorization', 'Bearer '+ window.sessionStorage.getItem('authorization'));
-            console.log('ev', ev)
-        });
-
+        
+        window._tui_api_event = 'readData';
+        window._tui_api_data = params;
+        
         this.$refs.tuiGrid.invoke('readData', 1, params, true)
+        
+        
     },
     // 더블클릭 이벤트
     dblclick(ev) {
@@ -121,6 +125,36 @@ export default {
         if(this.$gridResponse(res)) {
             this.$refs.tuiGrid.gridInstance.reloadData();
         }
+    },
+    beforeRequest(evt){
+        evt.stopped = true;
+        
+        var pagination = evt.instance.paginationManager.getPagination();
+        
+        if(window._tui_api_data){
+            window._tui_api_data.page = window._tui_api_page + 0;
+            window._tui_api_data.perPage = pagination._currentPage;
+        }
+        
+        window._tui_api_page = 1;
+        
+        if(window['instanceWithAuth'] && dataSource.api[window._tui_api_event]){
+            var _tmpTuiGrid = this.$refs.tuiGrid;
+            
+            window.instanceWithAuth.post( dataSource.api[window._tui_api_event]['url'] , window._tui_api_data)
+            .then(res => {
+                _tmpTuiGrid.invoke('resetData', res.data.data.contents, {pageState : res.data.data.pagination});
+            })
+            .catch(e => {
+                alert(e.message)
+            })
+        }
+    }
+    ,beforePageMove(evt){
+        window._tui_api_page = evt.page;
+    }
+    ,onGridUpdated(evt){
+        console.log('onGridUpdated', evt)
     }
   }
 }
