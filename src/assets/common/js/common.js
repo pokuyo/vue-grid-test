@@ -37,31 +37,31 @@ export default {
         Vue.prototype.$gridResponse = methods.gridResponse
         Vue.prototype.$getAuth = methods.getAuth
         // 그리드 조회
-        Vue.prototype.$pamTuiGridReadData = function( params ){
+        Vue.prototype.$cmmGridReadData = function( params ){
             
-            this.pamTuiApiEvent = 'readData';
-            this.pamTuiApiData = params;
+            this.cmmGridApiEvent = 'readData';
+            this.cmmGridApiData = params;
             
             this.$refs.tuiGrid.invoke('readData', 1, params, true)
         }
         // 그리드 조회 전 처리
-        Vue.prototype.$pamTuiGridBeforeRequest = function( evt, dataSource ){
+        Vue.prototype.$cmmGridBeforeRequest = function( evt, dataSource ){
             
             evt.stopped = true;
             
             var pagination = evt.instance.paginationManager.getPagination();
             
-            if(this.pamTuiApiData){
-                this.pamTuiApiData.page = this.pamTuiApiPage + 0;
-                this.pamTuiApiData.perPage = pagination._currentPage;
+            if(this.cmmGridApiData){
+                this.cmmGridApiData.page = this.cmmGridApiPage + 0;
+                this.cmmGridApiData.perPage = pagination._currentPage;
             }
             
-            this.pamTuiApiPage = 1;
+            this.cmmGridApiPage = 1;
             
-            if(window['instanceWithAuth'] && dataSource.api[this.pamTuiApiEvent]){
+            if(window['instanceWithAuth'] && dataSource.api[this.cmmGridApiEvent]){
                 var _tmpTuiGrid = this.$refs.tuiGrid;
                 
-                window.instanceWithAuth.post( dataSource.api[this.pamTuiApiEvent]['url'] , this.pamTuiApiData)
+                window.instanceWithAuth.post( dataSource.api[this.cmmGridApiEvent]['url'] , this.cmmGridApiData)
                 .then(res => {
                     _tmpTuiGrid.invoke('resetData', res.data.data.contents, {pageState : res.data.data.pagination});
                     
@@ -76,8 +76,8 @@ export default {
         }
         
         // 그리드 페이징 처리
-        Vue.prototype.$pamTuiGridBeforePageMove = function( evt ){
-            this.pamTuiApiPage = evt.page;
+        Vue.prototype.$cmmGridBeforePageMove = function( evt ){
+            this.cmmGridApiPage = evt.page;
         }
         
     }

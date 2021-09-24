@@ -87,7 +87,7 @@ export default {
         //refreshAuth()
         let params = { search: 'test', indexer: 99 }
         
-        this.$pamTuiGridReadData( params );
+        this.$cmmGridReadData( params );
     },
     // 더블클릭 이벤트
     dblclick(ev) {
@@ -123,10 +123,10 @@ export default {
     },
     beforeRequest(evt){
         
-        this.$pamTuiGridBeforeRequest( evt, dataSource );
+        this.$cmmGridBeforeRequest( evt, dataSource );
     }
     ,beforePageMove(evt){
-        this.$pamTuiGridBeforePageMove( evt );
+        this.$cmmGridBeforePageMove( evt );
     }
     ,onGridUpdated(evt){
         console.log('onGridUpdated', evt)
