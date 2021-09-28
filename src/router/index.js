@@ -25,6 +25,11 @@ export const router = new VueRouter({
             path: '/page3',
             name: 'page3',
             component: () => import('../views/Page3')
+        },
+        {
+            path: '/page4',
+            name: 'page4',
+            component: () => import('../views/Page4')
         }
     ]
 })
