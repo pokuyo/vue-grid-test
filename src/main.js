@@ -14,6 +14,9 @@ import 'tui-pagination/dist/tui-pagination.css'
 import { Grid } from '@toast-ui/vue-grid'
 import TuiGrid from 'tui-grid';
 
+// Vuetify
+import vuetify from "./plugins/vuetify"
+
 import comm from './assets/common/js/common.js'
 
 
@@ -36,5 +39,6 @@ new Vue({
   render: h => h(App),
   router,
   store,
-  axios,
+  vuetify,
+  axios
 }).$mount('#app')
